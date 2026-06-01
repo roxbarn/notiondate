@@ -5,9 +5,9 @@
     #lbl {
       font-family: monospace;
       font-size: xx-large;
-      color: #ffffff; /* white text */
+      color: #ffffff;
       padding: 5px;
-      border: 1px solid #ececec;
+      border: 1px solid rgba(255,255,255,0.12);
       text-align: center;
       line-height: 1.5;
       height: 85%;
@@ -16,7 +16,7 @@
       font-size: large;
     }
     body {
-      background-color: #000000; /* black background */
+      background-color: #000000;
       margin: 0;
       height: 100vh;
       display: flex;
@@ -30,12 +30,14 @@
 
   <script>
     var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
     var today = new Date();
     var dayOfWeek = weekday[today.getDay()];
-    var date = dayOfWeek + " " + today.getDate() + "/" + (today.getMonth()+1) + "/" + today.getFullYear();
+    var monthName = months[today.getMonth()];
+    var dateStr = dayOfWeek + " " + monthName + " " + today.getDate() + ", " + today.getFullYear();
 
-    // Removed greeting text ("Good morning, it's part")
-    document.getElementById('lbl').innerHTML = `<div id="date">${date}</div>`;
+    document.getElementById('lbl').textContent = dateStr;
   </script>
 </body>
 </html>
