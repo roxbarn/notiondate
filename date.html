@@ -8,11 +8,17 @@
       color: #ffffff;
       padding: 5px;
       text-align: center;
-      line-height: 1.5;
+      line-height: 1.2;
       height: 85%;
+      display: inline-block;
+    }
+    #weekday {
+      display: block;
+      font-size: 0.8em; /* slightly smaller */
+      margin-bottom: 0.25em;
     }
     #date {
-      font-size: large;
+      font-size: 1em; /* same as #lbl */
     }
     body {
       background-color: #000000;
@@ -25,7 +31,10 @@
   </style>
 </head>
 <body>
-  <div id="lbl"></div>
+  <div id="lbl">
+    <span id="weekday"></span>
+    <span id="date"></span>
+  </div>
 
   <script>
     var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
@@ -34,9 +43,10 @@
     var today = new Date();
     var dayOfWeek = weekday[today.getDay()];
     var monthName = months[today.getMonth()];
-    var dateStr = dayOfWeek + " " + monthName + " " + today.getDate() + ", " + today.getFullYear();
+    var dateStr = monthName + " " + today.getDate() + ", " + today.getFullYear();
 
-    document.getElementById('lbl').textContent = dateStr;
+    document.getElementById('weekday').textContent = dayOfWeek;
+    document.getElementById('date').textContent = dateStr;
   </script>
 </body>
 </html>
