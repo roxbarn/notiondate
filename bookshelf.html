@@ -1,21 +1,94 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Editable List</title>
-<style>
-  html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif}
-  html{background:#191919 linear-gradient(to top,#111,#333);color:#fff}
-  .container{max-width:800px;margin:3rem auto;padding:1rem;text-align:center}
-  form{margin-bottom:1rem}
-  input[type="text"]{padding:.5rem;width:60%;max-width:400px;border-radius:4px;border:1px solid #ccc;margin-right:.5rem}
-  button{padding:.55rem .8rem;border-radius:4px;border:none;background:brown;color:#fff;cursor:pointer}
-  ul.book-list{margin:0 auto;padding:0;list-style:none;border-bottom:10px solid brown;display:inline-block}
-  ul.book-list li{font-family:Georgia,serif;padding:1em .6em;background:#f1f1f1;display:inline-block;white-space:nowrap;border-radius:2px 2px 0 0;margin-right:.3rem;color:#111;writing-mode:vertical-rl;transition:transform .5s;background-image:linear-gradient(to right, rgba(0,0,0,.25), transparent 10%, rgba(0,0,0,.25) 90%)}
-  ul.book-list li:last-child{transform:rotate(-5deg)}
-  @media (max-width:440px){ul.book-list{transform:scale(.9)}input[type="text"]{width:100%;margin-bottom:.5rem}button{width:100%}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Editable List</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    html {
+      background-color: #191919;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      padding: .5rem;
+      width: 60%;
+      max-width: 400px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-right: .5rem;
+    }
+
+    button {
+      padding: .55rem .8rem;
+      border-radius: 4px;
+      border: none;
+      background: brown;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    ul.book-list {
+      margin: 0 auto;
+      padding: 0;
+      list-style: none;
+      border-bottom: 10px solid brown;
+      display: inline-block;
+    }
+
+    ul.book-list li {
+      font-family: Georgia, serif;
+      padding: 1em .6em;
+      background: #f1f1f1;
+      display: inline-block;
+      white-space: nowrap;
+      border-radius: 2px 2px 0 0;
+      margin-right: .3rem;
+      color: #111;
+      writing-mode: vertical-rl;
+      transition: transform .5s;
+      background-image: linear-gradient(
+        to right,
+        rgba(0, 0, 0, .25),
+        transparent 10%,
+        rgba(0, 0, 0, .25) 90%
+      );
+    }
+
+    ul.book-list li:last-child {
+      transform: rotate(-5deg);
+    }
+
+    @media (max-width: 440px) {
+      ul.book-list {
+        transform: scale(.9);
+      }
+      input[type="text"] {
+        width: 100%;
+        margin-bottom: .5rem;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -32,48 +105,57 @@
     </ul>
   </div>
 
-<script>
-const STORAGE_KEY = 'notion_book_list_v1';
-const form = document.getElementById('addForm');
-const input = document.getElementById('itemInput');
-const list = document.getElementById('bookList');
+  <script>
+    const STORAGE_KEY = 'notion_book_list_v1';
+    const form = document.getElementById('addForm');
+    const input = document.getElementById('itemInput');
+    const list = document.getElementById('bookList');
 
-function renderItem(text){
-  const li = document.createElement('li');
-  li.textContent = text;
-  li.style.writingMode = 'vertical-rl';
-  list.appendChild(li);
-  return li;
-}
+    function renderItem(text) {
+      const li = document.createElement('li');
+      li.textContent = text;
+      li.style.writingMode = 'vertical-rl';
+      list.appendChild(li);
+      return li;
+    }
 
-function loadList(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(!raw) return;
-  try{
-    const items = JSON.parse(raw);
-    items.forEach(renderItem);
-  }catch(e){console.error(e)}
-}
+    // Load saved list; if none, save the initial DOM items so refresh keeps them
+    function loadList() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const items = JSON.parse(raw);
+          // clear existing DOM list (initial static items)
+          list.innerHTML = '';
+          items.forEach(renderItem);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        // no saved data: read existing <li> from DOM and save them
+        const initial = Array.from(list.querySelectorAll('li')).map(li => li.textContent);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+      }
+    }
 
-function saveList(){
-  const items = Array.from(list.querySelectorAll('li')).map(li=>li.textContent);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
+    function saveList() {
+      const items = Array.from(list.querySelectorAll('li')).map(li => li.textContent);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
 
-form.addEventListener('submit', e=>{
-  e.preventDefault();
-  const text = input.value.trim();
-  if(!text) return;
-  const li = renderItem(text);
-  input.value = '';
-  input.focus();
-  saveList();
-  li.scrollIntoView({behavior:'smooth',inline:'center'});
-});
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      const li = renderItem(text);
+      input.value = '';
+      input.focus();
+      saveList();
+      li.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    });
 
-// initialize
-loadList();
-saveList();
-</script>
+    // initialize
+    loadList();
+  </script>
 </body>
 </html>
