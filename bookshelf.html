@@ -1,96 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Editable List</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
-    html {
-      background-color: #191919;
-      background-image: linear-gradient(to top, #111, #333);
-      background-repeat: no-repeat;
-      background-size: 100% 200%;
-      color: #fff;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 3rem auto;
-      padding: 1rem;
-      text-align: center;
-    }
-
-    form {
-      margin-bottom: 1rem;
-    }
-
-    input[type="text"] {
-      padding: .5rem;
-      width: 60%;
-      max-width: 400px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      margin-right: .5rem;
-    }
-
-    button {
-      padding: .55rem .8rem;
-      border-radius: 4px;
-      border: none;
-      background: brown;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    ul.book-list {
-      margin: 0 auto;
-      padding: 0;
-      list-style: none;
-      border-bottom: 10px solid brown;
-      display: inline-block;
-    }
-
-    ul.book-list li {
-      font-family: Georgia, serif;
-      padding: 1em .6em;
-      background: #f1f1f1;
-      display: inline-block;
-      white-space: nowrap;
-      border-radius: 2px 2px 0 0;
-      margin-right: .3rem;
-      background-image:
-        linear-gradient(
-          to right,
-          rgba(0, 0, 0, .25),
-          transparent 10%,
-          rgba(0, 0, 0, .25) 90%
-        );
-      transition: transform .5s;
-      color: #111;
-    }
-
-    ul.book-list li:last-child {
-      transform: rotate(-5deg);
-    }
-
-    /* vertical writing mode for each li (kept from original) */
-    ul.book-list li {
-      writing-mode: vertical-rl;
-    }
-
-    /* small responsive tweak to wrap vertically written items on narrow screens */
-    @media (max-width: 440px) {
-      ul.book-list { transform: scale(.9); }
-      input[type="text"] { width: 100%; margin-bottom: .5rem; }
-      button { width: 100%; }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Editable List</title>
+<style>
+  html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif}
+  html{background:#191919 linear-gradient(to top,#111,#333);color:#fff}
+  .container{max-width:800px;margin:3rem auto;padding:1rem;text-align:center}
+  form{margin-bottom:1rem}
+  input[type="text"]{padding:.5rem;width:60%;max-width:400px;border-radius:4px;border:1px solid #ccc;margin-right:.5rem}
+  button{padding:.55rem .8rem;border-radius:4px;border:none;background:brown;color:#fff;cursor:pointer}
+  ul.book-list{margin:0 auto;padding:0;list-style:none;border-bottom:10px solid brown;display:inline-block}
+  ul.book-list li{font-family:Georgia,serif;padding:1em .6em;background:#f1f1f1;display:inline-block;white-space:nowrap;border-radius:2px 2px 0 0;margin-right:.3rem;color:#111;writing-mode:vertical-rl;transition:transform .5s;background-image:linear-gradient(to right, rgba(0,0,0,.25), transparent 10%, rgba(0,0,0,.25) 90%)}
+  ul.book-list li:last-child{transform:rotate(-5deg)}
+  @media (max-width:440px){ul.book-list{transform:scale(.9)}input[type="text"]{width:100%;margin-bottom:.5rem}button{width:100%}}
+</style>
 </head>
 <body>
   <div class="container">
@@ -107,64 +32,48 @@
     </ul>
   </div>
 
-  <script>
-    const form = document.getElementById('addForm');
-    const input = document.getElementById('itemInput');
-    const list = document.getElementById('bookList');
+<script>
+const STORAGE_KEY = 'notion_book_list_v1';
+const form = document.getElementById('addForm');
+const input = document.getElementById('itemInput');
+const list = document.getElementById('bookList');
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      const li = document.createElement('li');
-      li.textContent = text;
-      // keep the same vertical writing mode
-      li.style.writingMode = 'vertical-rl';
-      list.appendChild(li);
-      input.value = '';
-      input.focus();
-      // optional: scroll the new item into view
-      li.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-    });
-    const STORAGE_KEY = 'notion_book_list_v1';
-
-// load on start
-function loadList() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
-  try {
-    const items = JSON.parse(raw);
-    items.forEach(text => {
-      const li = document.createElement('li');
-      li.textContent = text;
-      li.style.writingMode = 'vertical-rl';
-      list.appendChild(li);
-    });
-  } catch (e) { console.error(e); }
-}
-
-// save current list
-function saveList() {
-  const items = Array.from(list.querySelectorAll('li')).map(li => li.textContent);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-}
-
-// wire up
-loadList();
-
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const text = input.value.trim();
-  if (!text) return;
+function renderItem(text){
   const li = document.createElement('li');
   li.textContent = text;
   li.style.writingMode = 'vertical-rl';
   list.appendChild(li);
+  return li;
+}
+
+function loadList(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try{
+    const items = JSON.parse(raw);
+    items.forEach(renderItem);
+  }catch(e){console.error(e)}
+}
+
+function saveList(){
+  const items = Array.from(list.querySelectorAll('li')).map(li=>li.textContent);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+form.addEventListener('submit', e=>{
+  e.preventDefault();
+  const text = input.value.trim();
+  if(!text) return;
+  const li = renderItem(text);
   input.value = '';
   input.focus();
   saveList();
-  li.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  li.scrollIntoView({behavior:'smooth',inline:'center'});
 });
-  </script>
+
+// initialize
+loadList();
+saveList();
+</script>
 </body>
 </html>
